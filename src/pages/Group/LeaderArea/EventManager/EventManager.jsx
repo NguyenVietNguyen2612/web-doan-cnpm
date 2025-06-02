@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import GroupHeader from '../../../../components/layoutPrimitives/GroupHeader';
 import LeaderLayout from '../../../../components/layoutPrimitives/LeaderLayout';
+import Event from '../../../../components/groupWidgets/EventManager/Event';
 import { getGroupById } from '../../../../services/groupService';
 import { HiOutlineCheckCircle } from 'react-icons/hi';
 
@@ -24,7 +25,8 @@ if (typeof document !== 'undefined') {
 const EventManager = () => {
   const navigate = useNavigate();
   const { groupId } = useParams();
-    // State để lưu thông tin nhóm
+  
+  // State cho thông tin sự kiện
   const [eventInfo, setEventInfo] = useState({
     name: '',
     memberCount: 0,
@@ -42,6 +44,7 @@ const EventManager = () => {
   
   // State cho thông báo đặt chỗ thành công
   const [showBookingSuccess, setShowBookingSuccess] = useState(false);
+  
   // Lấy thông tin nhóm khi component được mount
   useEffect(() => {
     const fetchGroupData = async () => {
@@ -70,21 +73,18 @@ const EventManager = () => {
               };
               
               setEventInfo(updatedEventInfo);
-                // Hiển thị thông báo đặt chỗ thành công
+              // Hiển thị thông báo đặt chỗ thành công
               setShowBookingSuccess(true);
               
               // Ẩn thông báo sau 5 giây
               setTimeout(() => {
                 setShowBookingSuccess(false);
+                localStorage.removeItem('bookingConfirmed');
               }, 5000);
-              
-              // Xóa thông tin đặt chỗ từ localStorage sau khi đã sử dụng
-              localStorage.removeItem('bookingConfirmed');
-              return;
             }
+          } else {
+            setEventInfo(response.data);
           }
-          
-          setEventInfo(response.data);
         } else {
           console.error('Lỗi khi lấy thông tin nhóm:', response.message);
           alert('Không thể lấy thông tin nhóm. Vui lòng thử lại sau.');
@@ -97,44 +97,21 @@ const EventManager = () => {
 
     fetchGroupData();
   }, [groupId]);
-    // Các hàm xử lý sự kiện
+
+  // Xử lý các hành động
   const handleSettings = () => {
-    console.log('Mở cài đặt nhóm');
     alert('Tính năng cài đặt nhóm đang được phát triển');
   };
-  // Chỉ để tham chiếu, không cần sử dụng trong component mới
-  const handleBack = () => {
-    navigate('/groups');
-  };
 
-  const handleEditTime = () => {
-    console.log('Chỉnh sửa thời gian');
-    navigate(`/groups/${groupId}/time-editor`);
-  };
-
-  const handleEditLocation = () => {
-    console.log('Chỉnh sửa vị trí và số thích');
-    navigate(`/groups/${groupId}/location-preference`);
-  };
-
-  const handleViewGroupCalendar = () => {
-    console.log('Xem lịch rảnh chung của cả nhóm');
-    navigate(`/groups/${groupId}/group-calendar`);
-  };
-
-  const handleViewSuggestions = () => {
-    console.log('Xem danh sách các đề xuất');
-    navigate(`/groups/${groupId}/suggestion-list`);
-  };
-
-  const handleViewEvent = () => {
-    console.log('Xem sự kiện');
+  const handleViewBookingDetails = () => {
     alert('Chi tiết sự kiện sẽ được hiển thị tại đây');
   };
   
   const handleNotifyEvent = () => {
     alert('Đã gửi thông báo sự kiện đến tất cả thành viên!');
-  };    const handleBookingContact = () => {
+  };
+  
+  const handleBookingContact = () => {
     // Kiểm tra xem đã đặt chỗ chưa
     if (eventInfo.eventDetails?.bookingStatus === 'Đã xác nhận') {
       if (window.confirm('Bạn đã đặt chỗ cho sự kiện này. Bạn có muốn đặt lại không?')) {
@@ -147,28 +124,29 @@ const EventManager = () => {
   
   const handleEditEvent = () => {
     alert('Tính năng chỉnh sửa sự kiện đang được phát triển');
-    // Trong tương lai có thể thêm navigate đến trang chỉnh sửa sự kiện
-    // navigate(`/groups/${groupId}/edit-event`);
   };
-
+  
   // Các nút chức năng bên phải
   const rightButtons = [
-    { label: 'Chỉnh sửa thời gian', onClick: handleEditTime },
-    { label: 'Chỉnh sửa vị trí và số thích', onClick: handleEditLocation },
-    { label: 'Xem lịch rảnh chung của cả nhóm', onClick: handleViewGroupCalendar },
-    { label: 'Xem danh sách các đề xuất', onClick: handleViewSuggestions },
-    { label: 'Xem sự kiện', onClick: handleViewEvent },
+    { label: 'Chỉnh sửa thời gian', onClick: () => navigate(`/groups/${groupId}/time-editor`) },
+    { label: 'Chỉnh sửa vị trí và sở thích', onClick: () => navigate(`/groups/${groupId}/location-preference`) },
+    { label: 'Xem lịch rảnh chung của cả nhóm', onClick: () => navigate(`/groups/${groupId}/group-calendar`) },
+    { label: 'Xem danh sách các đề xuất', onClick: () => navigate(`/groups/${groupId}/suggestion-list`) },
+    { label: 'Xem sự kiện', onClick: handleViewBookingDetails },
   ];
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}      <GroupHeader 
+      {/* Header */}
+      <GroupHeader 
         groupName={eventInfo.name || 'Đang tải...'}
         memberCount={eventInfo.memberCount || 0}
         onSettings={handleSettings}
         showBackToGroups={true}
       />
-        {/* Main Content */}      <LeaderLayout rightButtons={rightButtons}>
+      
+      {/* Main Content */}
+      <LeaderLayout rightButtons={rightButtons}>
         {/* Notification đặt chỗ thành công */}
         {showBookingSuccess && (
           <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md animate-fade-in">
@@ -184,74 +162,35 @@ const EventManager = () => {
             </div>
           </div>
         )}
-        
-        <div className="bg-white rounded-md shadow-sm overflow-hidden">
-          {/* Các nút hành động */}          <div className="grid grid-cols-3 gap-4 p-4">
-            <button 
-              className="bg-purple-300 text-center py-2 px-4 rounded-md hover:bg-purple-400 transition-colors text-sm font-medium"
-              onClick={handleEditEvent}
-            >
-              Chỉnh sửa sự kiện
-            </button>
-            <button 
-              className="bg-purple-300 text-center py-2 px-4 rounded-md hover:bg-purple-400 transition-colors text-sm font-medium"
-              onClick={handleNotifyEvent}
-            >
-              Thông báo sự kiện
-            </button>
-            <button 
-              className="bg-purple-300 text-center py-2 px-4 rounded-md hover:bg-purple-400 transition-colors text-sm font-medium"
-              onClick={handleBookingContact}
-            >
-              Liên hệ đặt chỗ
-            </button>
-          </div>
 
-          {/* Thông tin sự kiện - Bảng hiển thị */}
-          <table className="w-full border-collapse">
-            <tbody>
-              <tr className="border-t border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Tên</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.name}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Địa điểm</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.location}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Thời gian</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.time}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Loại địa điểm</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.locationType}</td>
-              </tr>              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Tỉ lệ khớp sở thích</td>
-                <td className="py-3 px-4 flex items-center">
-                  <div className="w-24 h-2 bg-gray-200 rounded-full mr-2">
-                    <div 
-                      className="h-full bg-green-500 rounded-full" 
-                      style={{ width: eventInfo.eventDetails.matchRate }}
-                    ></div>
-                  </div>
-                  {eventInfo.eventDetails.matchRate}
-                </td>
-              </tr>
-              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Xác nhận đặt chỗ</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.bookingStatus}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Trạng thái thông báo</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.notificationStatus}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="py-3 px-4 bg-purple-100 font-medium">Số lượng người</td>
-                <td className="py-3 px-4">{eventInfo.eventDetails.attendeeCount}</td>
-              </tr>
-            </tbody>
-          </table>
+        {/* Các nút hành động */}
+        <div className="grid grid-cols-3 gap-4 p-4">
+          <button 
+            className="bg-purple-300 text-center py-2 px-4 rounded-md hover:bg-purple-400 transition-colors text-sm font-medium"
+            onClick={handleEditEvent}
+          >
+            Chỉnh sửa sự kiện
+          </button>
+          <button 
+            className="bg-purple-300 text-center py-2 px-4 rounded-md hover:bg-purple-400 transition-colors text-sm font-medium"
+            onClick={handleNotifyEvent}
+          >
+            Thông báo sự kiện
+          </button>
+          <button 
+            className="bg-purple-300 text-center py-2 px-4 rounded-md hover:bg-purple-400 transition-colors text-sm font-medium"
+            onClick={handleBookingContact}
+          >
+            Liên hệ đặt chỗ
+          </button>
         </div>
+
+        {/* Event Component */}
+        <Event
+          variant="leader"
+          eventDetails={eventInfo.eventDetails}
+          className="mt-4"
+        />
       </LeaderLayout>
     </div>
   );

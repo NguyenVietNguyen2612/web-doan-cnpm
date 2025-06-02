@@ -2,9 +2,9 @@ import api from './api';
 
 // Mock implementation until backend is ready
 const mockGroups = [
-  { id: 1, name: 'Nhóm 1', memberCount: 6, createdDate: '21-5-2025', status: 'Đang hoạt động' },
-  { id: 2, name: 'Nhóm 2', memberCount: 7, createdDate: '19-4-2025', status: 'Đang hoạt động' },
-  { id: 3, name: 'Nhóm 3', memberCount: 5, createdDate: '3-4-2025', status: 'Dừng hoạt động' },
+  { id: 1, name: 'Nhóm 1', memberCount: 6, createdDate: '21-5-2025', status: 'Đang hoạt động', isLeader: true },
+  { id: 2, name: 'Nhóm 2', memberCount: 7, createdDate: '19-4-2025', status: 'Đang hoạt động', isLeader: false },
+  { id: 3, name: 'Nhóm 3', memberCount: 5, createdDate: '3-4-2025', status: 'Dừng hoạt động', isLeader: true },
 ];
 
 // Get all groups for the current user
@@ -32,7 +32,7 @@ export const getUserGroups = async () => {
 
 // Create a new group
 export const createGroup = async (groupData) => {
-  try {
+  try {    
     // When API is ready, use this:
     // const response = await api.post('/groups', groupData);
     // return response.data;
@@ -44,6 +44,7 @@ export const createGroup = async (groupData) => {
       memberCount: 1, // Starting with just the creator
       createdDate: new Date().toLocaleDateString('vi-VN'),
       status: 'Đang hoạt động',
+      isLeader: true, // Creator is automatically the leader of the group
     };
     
     mockGroups.push(newGroup);
@@ -85,6 +86,39 @@ export const deleteGroup = async (groupId) => {
     return {
       success: false,
       message: error.message || 'Không thể xóa nhóm',
+    };
+  }
+};
+
+// Leave a group
+export const leaveGroup = async (groupId) => {
+  try {
+    // When API is ready, use this:
+    // const response = await api.post(`/groups/${groupId}/leave`);
+    // return response.data;
+    
+    // Mock response
+    const index = mockGroups.findIndex(group => group.id === parseInt(groupId, 10));
+    if (index !== -1) {
+      // If the user is the leader, we might want to handle that differently
+      // For now, just remove them from the group
+      mockGroups[index].memberCount = Math.max(1, mockGroups[index].memberCount - 1);
+      
+      // If the user was the leader, we remove the isLeader flag
+      if (mockGroups[index].isLeader) {
+        mockGroups[index].isLeader = false;
+      }
+    }
+    
+    return {
+      success: true,
+      message: 'Rời nhóm thành công',
+    };
+  } catch (error) {
+    console.error('Error leaving group:', error);
+    return {
+      success: false,
+      message: error.message || 'Không thể rời nhóm',
     };
   }
 };

@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import GroupHeader from '../../../../components/layoutPrimitives/GroupHeader';
 import LeaderLayout from '../../../../components/layoutPrimitives/LeaderLayout';
 import { getGroupById } from '../../../../services/groupService';
+import UpdateLocation from '../../../../components/groupWidgets/LocationAndPreference/UpdateLocation';
+import UpdatePreference from '../../../../components/groupWidgets/LocationAndPreference/UpdatePreference';
 
 // Danh sách các sở thích có thể chọn
 const preferenceOptions = [
@@ -13,7 +15,6 @@ const preferenceOptions = [
   { id: 'park', label: 'Công viên' },
   { id: 'zoo', label: 'Sở thú' },
   { id: 'museum', label: 'Bảo tàng' },
-  { id: 'bookstore', label: 'Nhà sách' },
   { id: 'library', label: 'Thư viện' },
   { id: 'beach', label: 'Bãi biển' },
   { id: 'mountain', label: 'Núi' },
@@ -34,7 +35,7 @@ const LocationPreference = () => {
   // State cho vị trí và sở thích
   const [location, setLocation] = useState('');
   const [preferences, setPreferences] = useState({});
-  
+
   // State để lưu trữ trạng thái ban đầu để phục hồi khi hủy
   const [originalLocation, setOriginalLocation] = useState('');
   const [originalPreferences, setOriginalPreferences] = useState({});
@@ -99,8 +100,8 @@ const LocationPreference = () => {
   }, [location, preferences, originalLocation, originalPreferences]);
 
   // Xử lý thay đổi vị trí
-  const handleLocationChange = (e) => {
-    setLocation(e.target.value);
+  const handleLocationChange = (newLocation) => {
+    setLocation(newLocation);
   };
 
   // Xử lý thay đổi sở thích
@@ -165,40 +166,20 @@ const LocationPreference = () => {
       {/* Main Content */}
       <LeaderLayout rightButtons={rightButtons}>
         <div className="bg-white p-4 rounded-md shadow-sm">
-          {/* Vị trí */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Nhập vị trí</label>
-            <input
-              type="text"
-              value={location}
-              onChange={handleLocationChange}
-              className="w-full p-2 border border-gray-300 rounded-md bg-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300"
-              placeholder="Nhập địa chỉ hoặc vị trí của bạn"
-            />
-          </div>
-          
-          {/* Sở thích */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Chọn sở thích</label>
-            <div className="bg-gray-200 rounded-md p-4 max-h-64 overflow-y-auto">
-              <div className="grid grid-cols-1 gap-2">
-                {preferenceOptions.map(option => (
-                  <div key={option.id} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id={option.id}
-                      checked={preferences[option.id] || false}
-                      onChange={() => handlePreferenceChange(option.id)}
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                    />
-                    <label htmlFor={option.id} className="ml-2 text-sm">
-                      {option.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          {/* Component UpdateLocation */}
+          <UpdateLocation
+            location={location}
+            onLocationChange={handleLocationChange}
+            isDisabled={false}
+          />
+            {/* Sở thích */}
+          <UpdatePreference
+            preferenceOptions={preferenceOptions}
+            preferences={preferences}
+            onPreferenceChange={handlePreferenceChange}
+            isDisabled={false}
+            className="mt-6"
+          />
           
           {/* Buttons */}
           <div className="flex justify-end space-x-4 mt-6">

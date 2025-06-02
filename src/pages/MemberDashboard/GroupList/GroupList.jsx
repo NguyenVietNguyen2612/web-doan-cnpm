@@ -23,6 +23,7 @@ const GroupList = () => {
     description: '',
     image: null
   });
+  
   // Fetch user groups on component mount
   useEffect(() => {
     const fetchGroups = async () => {
@@ -68,15 +69,20 @@ const GroupList = () => {
         alert('Không thể xóa nhóm: ' + response.message);
       }
     }
-  };
-  // Function to handle selecting a group
+  };  // Function to handle selecting a group
   const handleGroupSelect = (group) => {
     setSelectedGroup(group);
   };
   
-  // Function to handle double click on a group (navigate to event manager)
+  // Function to handle double click on a group - routes to appropriate view based on user's role in the group
   const handleGroupDoubleClick = (group) => {
-    navigate(`/groups/${group.id}/event-manager`);
+    // If the user is the leader of the group, navigate to the leader view
+    if (group.isLeader) {
+      navigate(`/groups/${group.id}/event-manager`);
+    } else {
+      // If the user is a regular member, navigate to the member view
+      navigate(`/groups/${group.id}/member/event-viewer`);
+    }
   };
 
   // Function to handle keyboard events for deletion
@@ -128,8 +134,7 @@ const GroupList = () => {
 
       {/* Groups table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border-collapse">
-          <thead>
+        <table className="min-w-full bg-white border-collapse">          <thead>
             <tr className="border-b">
               <th className="py-3 px-4 text-left font-medium text-gray-700">Tên nhóm</th>
               <th className="py-3 px-4 text-left font-medium text-gray-700">Số thành viên</th>
@@ -137,8 +142,7 @@ const GroupList = () => {
               <th className="py-3 px-4 text-left font-medium text-gray-700">Trạng thái nhóm</th>
             </tr>
           </thead>
-          <tbody>            {groups.map((group) => (
-              <tr 
+          <tbody>            {groups.map((group) => (              <tr 
                 key={group.id} 
                 className={`border-b hover:bg-gray-50 cursor-pointer ${selectedGroup?.id === group.id ? 'bg-gray-100' : ''}`}
                 onClick={() => handleGroupSelect(group)}
@@ -147,7 +151,16 @@ const GroupList = () => {
                 <td className="py-3 px-4">{group.name}</td>
                 <td className="py-3 px-4">{group.memberCount}</td>
                 <td className="py-3 px-4">{group.createdDate}</td>
-                <td className="py-3 px-4">{group.status}</td>
+                <td className="py-3 px-4">
+                  <div className="flex items-center">
+                    {group.status}
+                    {group.isLeader && (
+                      <span className="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">
+                        Trưởng nhóm
+                      </span>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>

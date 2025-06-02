@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import GroupHeader from '../../../../components/layoutPrimitives/GroupHeader';
 import LeaderLayout from '../../../../components/layoutPrimitives/LeaderLayout';
+import ChooseMonthAndYear from '../../../../components/groupWidgets/TimeManager/ChooseMonthAndYear';
+import ChoosePeriod from '../../../../components/groupWidgets/TimeManager/ChoosePeriod';
+import ChooseFreeTime from '../../../../components/groupWidgets/TimeManager/ChooseFreeTime';
 import { getGroupById } from '../../../../services/groupService';
 
 // Hàm để tạo ngày từ chuỗi ngày tháng năm dạng yyyy-mm-dd (định dạng chuẩn cho input type="date")
@@ -18,28 +21,6 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Tạo mảng giờ từ 7h sáng đến 22h tối
-const hoursArray = Array.from({ length: 16 }, (_, i) => 7 + i);
-
-// Tạo danh sách dropdown các tháng (bắt đầu từ tháng hiện tại và 6 tháng tiếp theo)
-const generateMonthOptions = () => {
-  const today = new Date();
-  const currentMonth = today.getMonth(); // 0-indexed
-  const currentYear = today.getFullYear();
-  
-  const months = [];
-  for (let i = 0; i < 7; i++) {
-    const month = (currentMonth + i) % 12;
-    const year = currentYear + Math.floor((currentMonth + i) / 12);
-    months.push({ 
-      value: month + 1, 
-      year: year,
-      label: `Tháng ${month + 1} - ${year}` 
-    });
-  }
-  return months;
-};
-
 const TimeEditor = () => {
   const navigate = useNavigate();
   const { groupId } = useParams();
@@ -47,28 +28,22 @@ const TimeEditor = () => {
     name: '',
     memberCount: 0,
   });
+  
   // Lấy ngày hiện tại và ngày kết thúc (7 ngày sau)
   const today = new Date();
   const defaultEndDate = new Date(today);
-  defaultEndDate.setDate(today.getDate() + 6); // 7 ngày tính cả ngày hiện tại
+  defaultEndDate.setDate(today.getDate() + 6);
   
-  // State cho các ngày được chọn
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [selectedDayRange, setSelectedDayRange] = useState({
-    startDate: formatDate(today),
-    endDate: formatDate(defaultEndDate)
+    startDate: today,
+    endDate: defaultEndDate
   });
   
   const [availabilityGrid, setAvailabilityGrid] = useState({});
   const [originalGrid, setOriginalGrid] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
-  
-  // State cho dropdown tháng
-  const currentMonth = today.getMonth() + 1; // JavaScript months are 0-indexed
-  const currentYear = today.getFullYear();
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-  const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
-  const dropdownRef = useRef(null);
 
   // Lấy thông tin nhóm khi component được mount
   useEffect(() => {
@@ -105,131 +80,25 @@ const TimeEditor = () => {
 
     fetchGroupData();
   }, [groupId]);
-
-  // Đóng dropdown khi click ra ngoài
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowMonthDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [dropdownRef]);
-  // Xử lý thay đổi trạng thái ô
-  const toggleCellAvailability = (day, hour) => {
-    setAvailabilityGrid(prevGrid => {
-      const newGrid = {...prevGrid};
-      newGrid[day] = {...newGrid[day]};
-      newGrid[day][hour] = !newGrid[day][hour];
-      setHasChanges(true);
-      return newGrid;
-    });
-  };
-
-  // Xử lý khi nhập ngày bắt đầu
-  const handleStartDateChange = (e) => {
-    const inputDate = e.target.value;
-    // Kiểm tra nếu ngày hợp lệ và không vượt quá 7 ngày so với ngày kết thúc
-    if (inputDate) {
-      const startDate = new Date(inputDate);
-      const endDate = new Date(selectedDayRange.endDate);
-      
-      // Tính số ngày giữa startDate và endDate
-      const diffTime = Math.abs(endDate - startDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (diffDays <= 6 && startDate <= endDate) { // 7 ngày tính cả ngày bắt đầu
-        setSelectedDayRange({
-          ...selectedDayRange,
-          startDate: inputDate
-        });
-      } else if (startDate > endDate) {
-        // Nếu ngày bắt đầu sau ngày kết thúc, cập nhật cả hai
-        const newEndDate = new Date(startDate);
-        newEndDate.setDate(startDate.getDate() + 6); // Thêm 6 ngày để có tổng 7 ngày
-        
-        setSelectedDayRange({
-          startDate: inputDate,
-          endDate: formatDate(newEndDate)
-        });
-      } else {
-        // Nếu khoảng thời gian > 7 ngày, cập nhật ngày kết thúc
-        const newEndDate = new Date(startDate);
-        newEndDate.setDate(startDate.getDate() + 6); // Thêm 6 ngày để có tổng 7 ngày
-        
-        setSelectedDayRange({
-          startDate: inputDate,
-          endDate: formatDate(newEndDate)
-        });
-      }
-    }
-  };
-
-  // Xử lý khi nhập ngày kết thúc
-  const handleEndDateChange = (e) => {
-    const inputDate = e.target.value;
-    // Kiểm tra nếu ngày hợp lệ và không vượt quá 7 ngày so với ngày bắt đầu
-    if (inputDate) {
-      const startDate = new Date(selectedDayRange.startDate);
-      const endDate = new Date(inputDate);
-      
-      // Tính số ngày giữa startDate và endDate
-      const diffTime = Math.abs(endDate - startDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (diffDays <= 6 && startDate <= endDate) { // 7 ngày tính cả ngày bắt đầu
-        setSelectedDayRange({
-          ...selectedDayRange,
-          endDate: inputDate
-        });
-      } else if (startDate > endDate) {
-        // Nếu ngày kết thúc trước ngày bắt đầu, cập nhật cả hai
-        const newStartDate = new Date(endDate);
-        newStartDate.setDate(endDate.getDate() - 6); // Lùi 6 ngày để có tổng 7 ngày
-        
-        setSelectedDayRange({
-          startDate: formatDate(newStartDate),
-          endDate: inputDate
-        });
-      } else {
-        // Nếu khoảng thời gian > 7 ngày, cập nhật ngày bắt đầu
-        const newStartDate = new Date(endDate);
-        newStartDate.setDate(endDate.getDate() - 6); // Lùi 6 ngày để có tổng 7 ngày
-        
-        setSelectedDayRange({
-          startDate: formatDate(newStartDate),
-          endDate: inputDate
-        });
-      }
-    }
-  };
-  // Hàm xử lý khi chọn tháng từ dropdown
-  const handleMonthSelect = (month, year) => {
+  
+  // Xử lý khi chọn tháng và năm từ dropdown
+  const handleMonthYearChange = (month, year) => {
     setSelectedMonth(month);
     setSelectedYear(year);
-    setShowMonthDropdown(false);
-    
-    // Cập nhật ngày bắt đầu và kết thúc để khớp với tháng đã chọn
-    const firstDayOfMonth = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month - 1, 7); // 7 ngày đầu tiên của tháng
-    
-    setSelectedDayRange({
-      startDate: formatDate(firstDayOfMonth),
-      endDate: formatDate(endDate)
-    });
   };
 
+  // Xử lý khi khoảng ngày thay đổi từ ChoosePeriod component
+  const handlePeriodChange = (newDateRange) => {
+    setSelectedDayRange(newDateRange);
+  };
   // Hàm xử lý khi nhấn nút Lưu
-  const handleSave = () => {
+  const handleSave = (updatedGrid) => {
     // Trong thực tế, ở đây sẽ gọi API để lưu dữ liệu xuống database
     try {
       // Giả lập gọi API thành công
       setTimeout(() => {
-        setOriginalGrid(JSON.parse(JSON.stringify(availabilityGrid)));
+        setOriginalGrid(JSON.parse(JSON.stringify(updatedGrid)));
+        setAvailabilityGrid(updatedGrid);
         setHasChanges(false);
         
         // Hiển thị thông báo thành công
@@ -253,11 +122,11 @@ const TimeEditor = () => {
   const handleSettings = () => {
     alert('Tính năng cài đặt nhóm đang được phát triển');
   };
+  
   // Chỉ để tham chiếu cho việc chuyển đến trang sự kiện khi cần
   const handleBack = () => {
     navigate(`/groups/${groupId}/event-manager`);
-  };
-
+  };  
   // Các nút chức năng bên phải
   const rightButtons = [
     { label: 'Chỉnh sửa thời gian', onClick: () => {} },
@@ -266,6 +135,14 @@ const TimeEditor = () => {
     { label: 'Xem danh sách các đề xuất', onClick: () => navigate(`/groups/${groupId}/suggestion-list`) },
     { label: 'Xem sự kiện', onClick: () => navigate(`/groups/${groupId}/event-manager`) },
   ];
+  
+  // Hàm xử lý khi component con thay đổi grid
+  const handleGridChange = (newGrid, hasChange) => {
+    setAvailabilityGrid(newGrid);
+    if (hasChange) {
+      setHasChanges(true);
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -280,141 +157,31 @@ const TimeEditor = () => {
       {/* Main Content */}
       <LeaderLayout rightButtons={rightButtons}>
         <div className="bg-white p-4 rounded-md shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">            {/* Dropdown Tháng */}
-            <div className="relative" ref={dropdownRef}>
-              <div 
-                className="border rounded-md p-2 cursor-pointer flex items-center justify-between bg-white hover:bg-gray-50"
-                onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-              >
-                <span>Tháng {selectedMonth} - {selectedYear}</span>
-                <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-              
-              {showMonthDropdown && (
-                <div className="absolute left-0 right-0 mt-1 border rounded-md bg-white z-10 shadow-lg max-h-48 overflow-y-auto">
-                  {generateMonthOptions().map(month => (
-                    <div 
-                      key={`${month.year}-${month.value}`} 
-                      className={`p-2 hover:bg-gray-100 cursor-pointer ${selectedMonth === month.value && selectedYear === month.year ? 'bg-gray-200' : ''}`}
-                      onClick={() => handleMonthSelect(month.value, month.year)}
-                    >
-                      {month.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>            {/* Ngày bắt đầu */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">            
+            {/* Dropdown Tháng */}
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Ngày bắt đầu</label>
-              <input
-                type="date"
-                className="w-full p-2 border rounded-md bg-white"
-                value={selectedDayRange.startDate}
-                onChange={handleStartDateChange}
-                min={formatDate(new Date())} // Không cho chọn ngày trong quá khứ
-              />
-            </div>{/* Nút Lưu */}
-            <div className="flex items-end">
-              <button 
-                className={`w-full text-center py-2 px-4 rounded-md transition-colors ${
-                  hasChanges 
-                  ? 'bg-green-500 hover:bg-green-600 text-white' 
-                  : 'bg-purple-300 hover:bg-purple-400'
-                }`}
-                onClick={handleSave}
-                disabled={!hasChanges}
-              >
-                {hasChanges ? 'Lưu thay đổi' : 'Đã lưu'}
-              </button>
+              <ChooseMonthAndYear onMonthYearChange={handleMonthYearChange} />
             </div>
-
-            {/* Ngày kết thúc */}
+            
+            {/* Chọn khoảng thời gian */}
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Ngày kết thúc</label>
-              <input
-                type="date"
-                className="w-full p-2 border rounded-md bg-white"
-                value={selectedDayRange.endDate}
-                onChange={handleEndDateChange}
+              <label className="block text-sm text-gray-600 mb-1">Khoảng thời gian</label>
+              <ChoosePeriod 
+                month={selectedMonth} 
+                year={selectedYear} 
+                currentWeek={0}
+                onPeriodChange={handlePeriodChange}
               />
             </div>
-
-            {/* Nút Hủy */}
-            <div className="flex items-end">
-              <button 
-                className={`w-full text-center py-2 px-4 rounded-md transition-colors ${
-                  hasChanges 
-                  ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-gray-300 cursor-not-allowed'
-                }`}
-                onClick={handleCancel}
-                disabled={!hasChanges}
-              >
-                Hủy thay đổi
-              </button>
-            </div>
-          </div>          {/* Chú thích */}
-          <div className="flex items-center mb-4 gap-6 pl-2">
-            <div className="flex items-center">
-              <div className="w-4 h-4 bg-green-500 rounded-sm mr-2"></div>
-              <span className="text-sm">Có thể tham gia</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 bg-white border border-gray-300 rounded-sm mr-2"></div>
-              <span className="text-sm">Không thể tham gia</span>
-            </div>
-            <div className="text-sm text-gray-500">
-              (Nhấp vào ô để đổi trạng thái)
-            </div>
           </div>
-        
-          {/* Bảng lịch */}
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border">
-              <thead>
-                <tr className="bg-purple-100">
-                  <th className="border p-2 text-center w-20">Giờ</th>
-                  <th className="border p-2 text-center">Thứ 2</th>
-                  <th className="border p-2 text-center">Thứ 3</th>
-                  <th className="border p-2 text-center">Thứ 4</th>
-                  <th className="border p-2 text-center">Thứ 5</th>
-                  <th className="border p-2 text-center">Thứ 6</th>
-                  <th className="border p-2 text-center">Thứ 7</th>
-                  <th className="border p-2 text-center">CN</th>
-                </tr>
-              </thead>
-              <tbody>
-                {hoursArray.map(hour => (
-                  <tr key={hour} className={hour % 2 === 0 ? 'bg-gray-50' : ''}>
-                    <td className="border p-2 text-center font-medium">{hour}:00</td>
-                    {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'].map(day => (
-                      <td 
-                        key={`${day}-${hour}`} 
-                        className={`border p-2 cursor-pointer transition-all ${
-                          availabilityGrid[day] && availabilityGrid[day][hour] 
-                            ? 'bg-green-500 hover:bg-green-600' 
-                            : 'hover:bg-gray-100'
-                        }`}
-                        onClick={() => toggleCellAvailability(day, hour)}
-                        title={`${day}, ${hour}:00 - ${availabilityGrid[day] && availabilityGrid[day][hour] ? 'Có thể tham gia' : 'Không thể tham gia'}`}
-                      >
-                        {availabilityGrid[day] && availabilityGrid[day][hour] ? 
-                          <div className="flex justify-center items-center">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                          </div>
-                          : ''
-                        }
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          
+          {/* Component ChooseFreeTime */}
+          <ChooseFreeTime 
+            initialGrid={originalGrid} 
+            onChange={handleGridChange}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
         </div>
       </LeaderLayout>
     </div>
