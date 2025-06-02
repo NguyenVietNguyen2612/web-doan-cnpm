@@ -25,6 +25,7 @@ import MemberLocationPreference from '../pages/Group/MemberArea/LocationPreferen
 //import AdminDashboard from '../pages/Admin/Dashboard';
 import EnterpriseDashboard from '../pages/Enterprise';
 import EnterprisePostsManager from '../pages/Enterprise/Posts';
+import PostEditor from '../pages/Enterprise/Posts/PostsEditor';
 import EnterpriseBookingManager from '../pages/Enterprise/BookingManager';
 import EnterpriseProfile from '../pages/Enterprise/Profile';
 
@@ -68,6 +69,8 @@ const AppRoutes = () => {
         <Route path="/enterprise" element={<EnterpriseDashboard />} />
         <Route path="/enterprise/dashboard" element={<EnterpriseDashboard />} />
         <Route path="/enterprise/posts" element={<EnterprisePostsManager />} />
+        <Route path="/enterprise/posts/edit/:id" element={<PostEditor />} />
+        <Route path="/enterprise/posts/new" element={<PostEditor />} />
         <Route path="/enterprise/booking" element={<EnterpriseBookingManager />} />
         <Route path="/enterprise/profile" element={<EnterpriseProfile />} />
       </Route>
