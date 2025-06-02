@@ -5,9 +5,14 @@ import Login from '../pages/Auth/Login';
 import SignUp from '../pages/Auth/SignUp';
 import AuthLayout from '../layouts/AuthLayout';
 import MemberLayout from '../layouts/MemberLayout';
-//import AdminLayout from '../layouts/AdminLayout';
+import AdminLayout from '../layouts/AdminLayout';
 import EnterpriseLayout from '../layouts/EnterpriseLayout';
 import Dashboard from '../pages/MemberDashboard';
+import AdminDashboard from '../pages/Admin/Dashboard';
+import ManageUsers from '../pages/Admin/ManageUsers';
+import ManageGroups from '../pages/Admin/ManageGroups/index.js';
+import ManageEnterprises from '../pages/Admin/ManageEnterprises/index.js';
+import PostApproval from '../pages/Admin/PostApproval/PostApproval.jsx';
 import MemberProfile from '../pages/MemberDashboard/MemberProfile';
 import MemberProfileEdit from '../pages/MemberDashboard/MemberProfileEdit';
 import MemberTime from '../pages/MemberDashboard/MemberTime';
@@ -22,12 +27,12 @@ import Booking from '../pages/Group/LeaderArea/EventManager/Booking';
 import EventViewer from '../pages/Group/MemberArea/EventViewer';
 import MemberTimeEditor from '../pages/Group/MemberArea/TimeEditor';
 import MemberLocationPreference from '../pages/Group/MemberArea/LocationPreference';
-//import AdminDashboard from '../pages/Admin/Dashboard';
 import EnterpriseDashboard from '../pages/Enterprise';
 import EnterprisePostsManager from '../pages/Enterprise/Posts';
 import PostEditor from '../pages/Enterprise/Posts/PostsEditor';
 import EnterpriseBookingManager from '../pages/Enterprise/BookingManager';
 import EnterpriseProfile from '../pages/Enterprise/Profile';
+import EnterpriseInformation from '../pages/EnterpriseInformation/EnterpriseInformation';
 
 const AppRoutes = () => {
   return (
@@ -58,13 +63,18 @@ const AppRoutes = () => {
       
       {/* Member routes for group functionality */}
       <Route path="/groups/:groupId/member/event-viewer" element={<EventViewer />} />
-      <Route path="/groups/:groupId/member/time-editor" element={<MemberTimeEditor />} />
-      <Route path="/groups/:groupId/member/location-preference" element={<MemberLocationPreference />} />
-
-      {/* Admin routes 
-      <Route element={<AdminLayout />}>
+      <Route path="/groups/:groupId/member/time-editor" element={<MemberTimeEditor />} />      <Route path="/groups/:groupId/member/location-preference" element={<MemberLocationPreference />} />
+        {/* Enterprise Information route */}
+      <Route path="/enterprise/:id" element={<EnterpriseInformation />} />      {/* Admin routes */}      <Route element={<AdminLayout />}>
         <Route path="/admin" element={<AdminDashboard />} />
-      </Route>*/}      {/* Enterprise routes */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<ManageUsers />} />
+        <Route path="/admin/posts" element={<PostApproval />} />
+        <Route path="/admin/groups" element={<ManageGroups />} />
+        <Route path="/admin/enterprises" element={<ManageEnterprises />} />
+      </Route>
+      
+      {/* Enterprise routes */}
       <Route element={<EnterpriseLayout />}>
         <Route path="/enterprise" element={<EnterpriseDashboard />} />
         <Route path="/enterprise/dashboard" element={<EnterpriseDashboard />} />
