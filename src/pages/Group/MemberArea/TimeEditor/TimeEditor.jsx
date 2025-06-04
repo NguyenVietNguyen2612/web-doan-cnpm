@@ -36,12 +36,7 @@ const TimeEditor = () => {
 
     fetchGroupData();
   }, [groupId]);
-
-  // Các hàm xử lý sự kiện
-  const handleSettings = () => {
-    console.log('Mở cài đặt nhóm');
-    alert('Tính năng cài đặt nhóm đang được phát triển');
-  };
+  // Settings popup is handled by GroupHeader component
 
   const handleEditTime = () => {
     // Đang ở trang này nên không cần hành động
@@ -65,9 +60,7 @@ const TimeEditor = () => {
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Header */}      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
-        memberCount={groupInfo.memberCount || 0}
-        onSettings={handleSettings}
-        showBackToGroups={true}
+        memberCount={groupInfo.memberCount || 0}        showBackToGroups={true}
         isLeader={false}
       />
       

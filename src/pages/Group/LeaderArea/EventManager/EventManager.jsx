@@ -115,9 +115,8 @@ const EventManager = () => {
       navigate(`/groups/${groupId}/booking`);
     }
   };
-  
-  const handleEditEvent = () => {
-    alert('Tính năng chỉnh sửa sự kiện đang được phát triển');
+    const handleEditEvent = () => {
+    navigate(`/groups/${groupId}/event-update`);
   };
   
   // Các nút chức năng bên phải

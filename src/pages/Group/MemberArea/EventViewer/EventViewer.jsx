@@ -50,11 +50,6 @@ const EventViewer = () => {
   }, [groupId]);
   
   // Các hàm xử lý sự kiện
-  const handleSettings = () => {
-    console.log('Mở cài đặt nhóm');
-    // Việc hiển thị cửa sổ cài đặt đã được xử lý trong GroupHeader
-  };
-
   const handleEditTime = () => {
     navigate(`/groups/${groupId}/member/time-editor`);
   };
@@ -80,7 +75,6 @@ const EventViewer = () => {
       <GroupHeader 
         groupName={eventInfo.name || 'Đang tải...'}
         memberCount={eventInfo.memberCount || 0}
-        onSettings={handleSettings}
         showBackToGroups={true}
         isLeader={false}
         groupId={groupId}

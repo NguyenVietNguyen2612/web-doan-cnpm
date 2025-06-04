@@ -19,12 +19,18 @@ const EventUpdate = () => {
       matchRate: '',
     }
   });
-
   const [eventInfo, setEventInfo] = useState({
     time: '',
     attendeeCount: '',
   });
+  
+  // Store original event info for cancel functionality
+  const [originalEventInfo, setOriginalEventInfo] = useState({
+    time: '',
+    attendeeCount: '',
+  });
 
+  const [hasChanges, setHasChanges] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -36,6 +42,13 @@ const EventUpdate = () => {
         const response = await getGroupById(groupId);
         if (response.success) {
           setGroupInfo(response.data);
+          // Lưu thông tin ban đầu để có thể khôi phục khi hủy
+          const initialEventInfo = {
+            time: response.data.eventDetails?.time || '',
+            attendeeCount: response.data.eventDetails?.attendeeCount || '',
+          };
+          setEventInfo(initialEventInfo);
+          setOriginalEventInfo(initialEventInfo);
         }
       } catch (error) {
         console.error('Lỗi khi lấy thông tin nhóm:', error);
@@ -44,14 +57,21 @@ const EventUpdate = () => {
 
     fetchGroupData();
   }, [groupId]);
-
   // Xử lý khi người dùng nhập thông tin
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEventInfo(prev => ({
-      ...prev,
+    const newEventInfo = {
+      ...eventInfo,
       [name]: value
-    }));
+    };
+    setEventInfo(newEventInfo);
+    
+    // Kiểm tra xem có sự thay đổi so với dữ liệu ban đầu không
+    const isChanged = 
+      newEventInfo.time !== originalEventInfo.time || 
+      newEventInfo.attendeeCount !== originalEventInfo.attendeeCount;
+    setHasChanges(isChanged);
+    
     // Xóa lỗi khi người dùng bắt đầu nhập
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
@@ -96,8 +116,23 @@ const EventUpdate = () => {
       setIsSubmitting(false);
     }
   };
+  // Xử lý khi nhấn nút Hủy
+  const handleCancel = () => {
+    // Khôi phục lại dữ liệu ban đầu
+    setEventInfo(originalEventInfo);
+    setErrors({});
+    setHasChanges(false);
+  };
 
+  // Xử lý khi nhấn nút Back
   const handleBack = () => {
+    // Nếu có thay đổi, hiển thị xác nhận trước khi quay lại
+    if (hasChanges) {
+      const confirmBack = window.confirm('Bạn có thay đổi chưa được lưu. Bạn có chắc muốn quay lại không?');
+      if (!confirmBack) {
+        return;
+      }
+    }
     navigate(`/groups/${groupId}/event-manager`);
   };
 
@@ -142,18 +177,22 @@ const EventUpdate = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Chỉnh sửa thông tin sự kiện</h2>
-            <div className="flex space-x-4">
-              <button 
-                onClick={handleBack}
-                className="flex items-center justify-center bg-gray-200 py-2 px-6 rounded-md hover:bg-gray-300 transition-all text-gray-700 font-medium"
+            <div className="flex space-x-4">              <button 
+                onClick={handleCancel}
+                disabled={!hasChanges || isSubmitting}
+                className={`flex items-center justify-center py-2 px-6 rounded-md transition-all font-medium ${
+                  hasChanges && !isSubmitting
+                    ? 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
               >
                 Huỷ
               </button>
               <button 
                 onClick={handleConfirmUpdate}
-                disabled={isSubmitting}
-                className={`flex items-center justify-center bg-purple-500 py-2 px-6 rounded-md hover:bg-purple-600 transition-all text-white font-medium ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                disabled={!hasChanges || isSubmitting}
+                className={`flex items-center justify-center bg-purple-500 py-2 px-6 rounded-md transition-all text-white font-medium ${
+                  !hasChanges || isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-purple-600'
                 }`}
               >
                 {isSubmitting ? (
