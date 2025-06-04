@@ -39,9 +39,6 @@ const GroupCalendar = () => {
     setCurrentWeek(0);
   }, []);
 
-  const handleSettings = useCallback(() => {
-    alert('Tính năng cài đặt nhóm đang được phát triển');
-  }, []);
 
   // Memoized navigation buttons
   const rightButtons = useMemo(() => [
@@ -134,12 +131,11 @@ const GroupCalendar = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <GroupHeader 
+      {/* Header */}      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
         memberCount={groupInfo.memberCount || 0}
-        onSettings={handleSettings}
         showBackToGroups={true}
+        isLeader={true}
       />
       
       {/* Main Content */}

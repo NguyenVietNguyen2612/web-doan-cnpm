@@ -48,9 +48,8 @@ const Home = () => {
           <h1 className="text-black text-5xl font-bold mb-10 leading-tight">
             Giải pháp quản lý<br />
             lịch nhóm dễ dàng
-          </h1>
-            <div className="mt-4">
-            <Link to="/create-group">
+          </h1>            <div className="mt-4">
+            <Link to="/login">
               <RoundButton variant="primary-light" size="lg">
                 TẠO NHÓM NGAY
               </RoundButton>

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import defaultAvatar from '../../../assets/images/UserFace.png';
 import { getUserProfile } from '../../../services/profileService';
+import { useDialog } from '../../../components/common';
 
 const MemberProfile = () => {
   const navigate = useNavigate();
+  const { showDialog, DialogComponent } = useDialog();
   const [userData, setUserData] = useState({
     name: "Nguyễn Văn A",
     phone: "012345678",
@@ -38,8 +40,10 @@ const MemberProfile = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white overflow-auto">
-      <div className="flex flex-col items-center w-full h-full px-4 md:px-8 py-6">        {/* Header with buttons */}
-        <div className="flex justify-end w-full max-w-3xl mb-6">          <button
+      <div className="flex flex-col items-center w-full h-full px-4 md:px-8 py-6">
+        {/* Header with buttons */}
+        <div className="flex justify-end w-full max-w-3xl mb-6">
+          <button
             className="px-4 py-2 bg-white border border-gray-300 rounded-md mr-2 hover:bg-gray-50 transition-colors text-sm"
             onClick={() => navigate('/profile/edit')}
           >
@@ -48,10 +52,14 @@ const MemberProfile = () => {
           <button
             className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm"
             onClick={() => {
-              // Đăng xuất và chuyển hướng về trang đăng nhập
-              if (window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
-                window.location.href = '/login';
-              }
+              showDialog({
+                type: 'confirm',
+                title: 'Xác nhận đăng xuất',
+                message: 'Bạn có chắc chắn muốn đăng xuất không?',
+                onConfirm: () => {
+                  window.location.href = '/login';
+                }
+              });
             }}
           >
             Đăng xuất
@@ -98,6 +106,7 @@ const MemberProfile = () => {
           </div>
         </div>
       </div>
+      <DialogComponent />
     </div>
   );
 };

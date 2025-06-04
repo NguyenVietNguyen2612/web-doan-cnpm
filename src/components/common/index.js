@@ -10,14 +10,15 @@ import Logo from './Logo';
 import Sidebar from './Sidebar';
 import Scrollbar from './Scrollbar';
 
+import { Dialog, useDialog } from './Dialog';
+
 export {
   Button,
-  //IconButton,
   Input,
   Logo,
-  //Modal,
-  //Select,
   Sidebar,
-  Scrollbar
+  Scrollbar,
+  Dialog,
+  useDialog
 };
 

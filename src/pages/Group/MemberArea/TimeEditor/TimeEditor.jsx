@@ -63,12 +63,12 @@ const TimeEditor = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <GroupHeader 
+      {/* Header */}      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
         memberCount={groupInfo.memberCount || 0}
         onSettings={handleSettings}
         showBackToGroups={true}
+        isLeader={false}
       />
       
       {/* Main Content */}

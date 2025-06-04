@@ -117,12 +117,6 @@ const TimeEditor = () => {
     setHasChanges(false);
     alert('Đã hủy các thay đổi!');
   };
-
-  // Các hàm xử lý điều hướng
-  const handleSettings = () => {
-    alert('Tính năng cài đặt nhóm đang được phát triển');
-  };
-  
   // Chỉ để tham chiếu cho việc chuyển đến trang sự kiện khi cần
   const handleBack = () => {
     navigate(`/groups/${groupId}/event-manager`);
@@ -146,12 +140,11 @@ const TimeEditor = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header - luôn trở về trang danh sách nhóm */}
-      <GroupHeader 
+      {/* Header - luôn trở về trang danh sách nhóm */}      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
         memberCount={groupInfo.memberCount || 0}
-        onSettings={handleSettings}
         showBackToGroups={true}
+        isLeader={true}
       />
       
       {/* Main Content */}

@@ -97,12 +97,6 @@ const EventManager = () => {
 
     fetchGroupData();
   }, [groupId]);
-
-  // Xử lý các hành động
-  const handleSettings = () => {
-    alert('Tính năng cài đặt nhóm đang được phát triển');
-  };
-
   const handleViewBookingDetails = () => {
     alert('Chi tiết sự kiện sẽ được hiển thị tại đây');
   };
@@ -137,12 +131,11 @@ const EventManager = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <GroupHeader 
+      {/* Header */}      <GroupHeader 
         groupName={eventInfo.name || 'Đang tải...'}
         memberCount={eventInfo.memberCount || 0}
-        onSettings={handleSettings}
         showBackToGroups={true}
+        isLeader={true}
       />
       
       {/* Main Content */}

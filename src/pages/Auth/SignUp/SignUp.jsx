@@ -70,13 +70,26 @@ const SignUp = () => {
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
-    }
+    }    // Gửi dữ liệu lên server
+    try {
+      // Giả lập gọi API đăng ký
+      console.log('Form submitted:', formData);
+      
+      // Lưu thông tin user vào localStorage (giả lập đăng nhập luôn)
+      localStorage.setItem('user', JSON.stringify({
+        username: formData.username,
+        email: formData.email,
+        role: 'member'
+      }));
+      localStorage.setItem('token', 'fake-token');
 
-    // Gửi dữ liệu lên server
-    console.log('Form submitted:', formData);
-    // TODO: Gửi request đăng ký đến server
-    // Nếu đăng ký thành công, chuyển hướng về trang đăng nhập
-    // navigate('/login');
+      // Chuyển hướng đến trang danh sách nhóm
+      navigate('/member-dashboard/group-list');
+    } catch (error) {
+      setErrors({
+        submit: 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.'
+      });
+    }
   };
 
   return (

@@ -99,12 +99,6 @@ const SuggestionList = () => {
     alert(`Đã thêm địa điểm id=${suggestionId} vào sự kiện.`);
     navigate(`/groups/${groupId}/event-manager`);
   };
-
-  // Xử lý các hành động điều hướng
-  const handleSettings = () => {
-    alert('Tính năng cài đặt nhóm đang được phát triển');
-  };
-
   // Các nút chức năng bên phải
   const rightButtons = [
     { label: 'Chỉnh sửa thời gian', onClick: () => navigate(`/groups/${groupId}/time-editor`) },
@@ -143,12 +137,11 @@ const SuggestionList = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <GroupHeader 
+      {/* Header */}      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
         memberCount={groupInfo.memberCount || 0}
-        onSettings={handleSettings}
         showBackToGroups={true}
+        isLeader={true}
       />
       
       {/* Main Content */}

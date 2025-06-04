@@ -48,15 +48,15 @@ const GroupHeader = ({
       navigate(backTarget);
     }
   };
-  
-  // Xử lý khi nhấn nút cài đặt
+    // Xử lý khi nhấn nút cài đặt
   const handleSettingsClick = () => {
-    // Nếu có callback onSettings thì gọi nó
+    // Nếu có callback onSettings thì gọi nó và không mở cửa sổ cài đặt
     if (onSettings) {
       onSettings();
+    } else {
+      // Nếu không có callback, hiển thị cửa sổ cài đặt mặc định
+      setShowSettings(true);
     }
-    // Hiển thị cửa sổ cài đặt
-    setShowSettings(true);
   };
   
   // Xử lý khi đóng cửa sổ cài đặt

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HiUsers, HiDocumentText, HiUserGroup, HiOfficeBuilding, HiExclamationCircle } from 'react-icons/hi';
+import { useDialog } from '../../../components/common';
 
 // Mocked data for demonstration
 // In a real application, this would come from API calls
@@ -24,7 +25,6 @@ const mockData = {
   enterpriseStats: {
     total: 54,
     active: 48,
-    premium: 22
   },
   recentReports: [
     { id: 1, type: 'post', title: 'Nội dung không phù hợp', status: 'pending', date: '2025-06-01' },
@@ -103,6 +103,7 @@ const ReportItem = ({ report }) => {
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(mockData);
+  const { showDialog, DialogComponent } = useDialog();
   
   // In a real application, we would fetch data here
   useEffect(() => {
@@ -122,10 +123,29 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-gray-50 p-6">
-      {/* Header area */}
-      <div className="bg-white shadow-sm p-4 rounded-lg border-b mb-6">
-        <h1 className="text-xl font-semibold text-gray-800">Trang quản trị</h1>
-        <p className="text-sm text-gray-600">Thống kê và quản lý toàn hệ thống</p>
+      {/* Header area */}      <div className="bg-white shadow-sm p-4 rounded-lg border-b mb-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-800">Trang quản trị</h1>
+            <p className="text-sm text-gray-600">Thống kê và quản lý toàn hệ thống</p>
+          </div>
+          <button            onClick={() => {
+              showDialog({
+                type: 'confirm',
+                title: 'Xác nhận đăng xuất',
+                message: 'Bạn có chắc chắn muốn đăng xuất?',
+                onConfirm: () => {
+                  localStorage.removeItem('user');
+                  localStorage.removeItem('token');
+                  window.location.href = '/login';
+                }
+              });
+            }}
+            className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm"
+          >
+            Đăng xuất
+          </button>
+        </div>
       </div>
       
       {/* Stats cards */}
@@ -166,29 +186,9 @@ const AdminDashboard = () => {
         <div className="space-y-4">
           {stats.recentReports.map(report => (
             <ReportItem key={report.id} report={report} />
-          ))}
-        </div>
+          ))}        </div>
       </div>
-      
-      {/* Quick links */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <button className="bg-white p-4 rounded-lg shadow-sm hover:bg-gray-50 border border-gray-200 flex items-center justify-center">
-          <HiExclamationCircle className="h-5 w-5 text-red-500 mr-2" />
-          <span className="text-gray-800">Xử lý báo cáo</span>
-        </button>
-        <button className="bg-white p-4 rounded-lg shadow-sm hover:bg-gray-50 border border-gray-200 flex items-center justify-center">
-          <HiDocumentText className="h-5 w-5 text-amber-500 mr-2" />
-          <span className="text-gray-800">Duyệt bài đăng mới</span>
-        </button>
-        <button className="bg-white p-4 rounded-lg shadow-sm hover:bg-gray-50 border border-gray-200 flex items-center justify-center">
-          <HiUsers className="h-5 w-5 text-blue-500 mr-2" />
-          <span className="text-gray-800">Quản lý người dùng</span>
-        </button>
-        <button className="bg-white p-4 rounded-lg shadow-sm hover:bg-gray-50 border border-gray-200 flex items-center justify-center">
-          <HiOfficeBuilding className="h-5 w-5 text-purple-500 mr-2" />
-          <span className="text-gray-800">Thêm doanh nghiệp mới</span>
-        </button>
-      </div>
+      <DialogComponent />
     </div>
   );
 };

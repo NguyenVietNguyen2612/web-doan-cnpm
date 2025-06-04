@@ -1,32 +1,38 @@
 // filepath: e:\web-doan-third\web-doan-cnpm\src\routes\AppRoutes.jsx
 import { Routes, Route } from 'react-router-dom';
+//Auth routes
 import Home from '../pages/Auth/Home';
 import Login from '../pages/Auth/Login';
 import SignUp from '../pages/Auth/SignUp';
 import AuthLayout from '../layouts/AuthLayout';
+// Layouts
 import MemberLayout from '../layouts/MemberLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import EnterpriseLayout from '../layouts/EnterpriseLayout';
+//Member routes
 import Dashboard from '../pages/MemberDashboard';
+import MemberProfile from '../pages/MemberDashboard/MemberProfile';
+import MemberProfileEdit from '../pages/MemberDashboard/MemberProfileEdit';
+import MemberTime from '../pages/MemberDashboard/MemberTime';
+import GroupList from '../pages/MemberDashboard/GroupList';
+//Admin routes
 import AdminDashboard from '../pages/Admin/Dashboard';
 import ManageUsers from '../pages/Admin/ManageUsers';
 import ManageGroups from '../pages/Admin/ManageGroups/index.js';
 import ManageEnterprises from '../pages/Admin/ManageEnterprises/index.js';
 import PostApproval from '../pages/Admin/PostApproval/PostApproval.jsx';
-import MemberProfile from '../pages/MemberDashboard/MemberProfile';
-import MemberProfileEdit from '../pages/MemberDashboard/MemberProfileEdit';
-import MemberTime from '../pages/MemberDashboard/MemberTime';
-import GroupList from '../pages/MemberDashboard/GroupList';
+//Leader area routes
 import EventManager from '../pages/Group/LeaderArea/EventManager';
 import TimeEditor from '../pages/Group/LeaderArea/TimeEditor';
 import LocationPreference from '../pages/Group/LeaderArea/LocationPreference';
 import GroupCalendar from '../pages/Group/LeaderArea/GroupCalendar';
 import SuggestionList from '../pages/Group/LeaderArea/SuggestionList';
 import Booking from '../pages/Group/LeaderArea/EventManager/Booking';
-// Member area components
+// Member area routes
 import EventViewer from '../pages/Group/MemberArea/EventViewer';
 import MemberTimeEditor from '../pages/Group/MemberArea/TimeEditor';
 import MemberLocationPreference from '../pages/Group/MemberArea/LocationPreference';
+// Enterprise routes
 import EnterpriseDashboard from '../pages/Enterprise';
 import EnterprisePostsManager from '../pages/Enterprise/Posts';
 import PostEditor from '../pages/Enterprise/Posts/PostsEditor';

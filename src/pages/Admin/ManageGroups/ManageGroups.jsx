@@ -3,8 +3,10 @@ import SearchBar from '../../../components/common/SearchBar';
 import Select from '../../../components/common/Select';
 import { HiUserGroup, HiUser, HiCalendar, HiLocationMarker } from 'react-icons/hi';
 import Scrollbar from '../../../components/common/Scrollbar';
+import { useDialog } from '../../../components/common';
 
 const ManageGroups = () => {
+  const { showDialog, DialogComponent } = useDialog();
   const [groups, setGroups] = useState([
     {
       id: 1,
@@ -46,14 +48,19 @@ const ManageGroups = () => {
       return;
     }
 
-    if (window.confirm('Bạn có chắc chắn muốn khóa những nhóm đã chọn?')) {
-      setGroups(groups.map(group =>
-        selectedGroups.some(selected => selected.id === group.id)
-          ? { ...group, status: 'locked' }
-          : group
-      ));
-      setSelectedGroups([]);
-    }
+    showDialog({
+      type: 'confirm',
+      title: 'Xác nhận khóa nhóm',
+      message: 'Bạn có chắc chắn muốn khóa những nhóm đã chọn?',
+      onConfirm: () => {
+        setGroups(groups.map(group =>
+          selectedGroups.some(selected => selected.id === group.id)
+            ? { ...group, status: 'locked' }
+            : group
+        ));
+        setSelectedGroups([]);
+      }
+    });
   };
 
   const handleDelete = () => {
@@ -62,12 +69,17 @@ const ManageGroups = () => {
       return;
     }
 
-    if (window.confirm('Bạn có chắc chắn muốn xóa vĩnh viễn những nhóm đã chọn?')) {
-      setGroups(groups.filter(group =>
-        !selectedGroups.some(selected => selected.id === group.id)
-      ));
-      setSelectedGroups([]);
-    }
+    showDialog({
+      type: 'confirm',
+      title: 'Xác nhận xóa nhóm',
+      message: 'Bạn có chắc chắn muốn xóa vĩnh viễn những nhóm đã chọn?',
+      onConfirm: () => {
+        setGroups(groups.filter(group =>
+          !selectedGroups.some(selected => selected.id === group.id)
+        ));
+        setSelectedGroups([]);
+      }
+    });
   };
 
   const renderGroupItem = (group) => {
@@ -159,6 +171,7 @@ const ManageGroups = () => {
           />
         </Scrollbar>
       </div>
+      <DialogComponent />
     </div>
   );
 };

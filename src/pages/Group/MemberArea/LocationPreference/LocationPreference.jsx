@@ -61,18 +61,16 @@ const LocationPreference = () => {
 
     fetchGroupData();
   }, [groupId]);
-
   // Xử lý các hành động điều hướng
   const handleEditTime = () => {
-    navigate(`/groups/${groupId}/time-editor`);
+    navigate(`/groups/${groupId}/member/time-editor`);
   };
 
   const handleEditLocation = () => {
     // Do nothing since we're already on this page
   };
-
   const handleViewEvent = () => {
-    navigate(`/groups/${groupId}/event-viewer`);
+    navigate(`/groups/${groupId}/member/event-viewer`);
   };
 
   const handleSettings = () => {
@@ -98,12 +96,12 @@ const LocationPreference = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <GroupHeader 
+      {/* Header */}      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
         memberCount={groupInfo.memberCount || 0}
         onSettings={handleSettings}
         showBackToGroups={true}
+        isLeader={false}
       />
       
       {/* Main Content */}
