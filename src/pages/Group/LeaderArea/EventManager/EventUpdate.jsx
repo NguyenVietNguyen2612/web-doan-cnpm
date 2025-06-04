@@ -21,13 +21,11 @@ const EventUpdate = () => {
   });
   const [eventInfo, setEventInfo] = useState({
     time: '',
-    attendeeCount: '',
   });
   
   // Store original event info for cancel functionality
   const [originalEventInfo, setOriginalEventInfo] = useState({
     time: '',
-    attendeeCount: '',
   });
 
   const [hasChanges, setHasChanges] = useState(false);
@@ -45,7 +43,6 @@ const EventUpdate = () => {
           // Lưu thông tin ban đầu để có thể khôi phục khi hủy
           const initialEventInfo = {
             time: response.data.eventDetails?.time || '',
-            attendeeCount: response.data.eventDetails?.attendeeCount || '',
           };
           setEventInfo(initialEventInfo);
           setOriginalEventInfo(initialEventInfo);
@@ -57,6 +54,7 @@ const EventUpdate = () => {
 
     fetchGroupData();
   }, [groupId]);
+  
   // Xử lý khi người dùng nhập thông tin
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,9 +65,7 @@ const EventUpdate = () => {
     setEventInfo(newEventInfo);
     
     // Kiểm tra xem có sự thay đổi so với dữ liệu ban đầu không
-    const isChanged = 
-      newEventInfo.time !== originalEventInfo.time || 
-      newEventInfo.attendeeCount !== originalEventInfo.attendeeCount;
+    const isChanged = newEventInfo.time !== originalEventInfo.time;
     setHasChanges(isChanged);
     
     // Xóa lỗi khi người dùng bắt đầu nhập
@@ -84,10 +80,6 @@ const EventUpdate = () => {
 
     if (!eventInfo.time.trim()) {
       newErrors.time = 'Vui lòng nhập thời gian sự kiện';
-    }
-
-    if (!eventInfo.attendeeCount || eventInfo.attendeeCount < 1) {
-      newErrors.attendeeCount = 'Vui lòng nhập số lượng người tham gia hợp lệ';
     }
 
     setErrors(newErrors);
@@ -177,7 +169,8 @@ const EventUpdate = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Chỉnh sửa thông tin sự kiện</h2>
-            <div className="flex space-x-4">              <button 
+            <div className="flex space-x-4">
+              <button 
                 onClick={handleCancel}
                 disabled={!hasChanges || isSubmitting}
                 className={`flex items-center justify-center py-2 px-6 rounded-md transition-all font-medium ${
@@ -271,20 +264,12 @@ const EventUpdate = () => {
                     <label className="text-gray-700 font-medium">Số lượng người tham gia</label>
                   </div>
                   <div className="relative">
-                    <input
-                      type="number"
-                      name="attendeeCount"
-                      value={eventInfo.attendeeCount}
-                      onChange={handleInputChange}
-                      min="1"
-                      className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-300 focus:outline-none ${
-                        errors.attendeeCount ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Nhập số lượng người tham gia"
-                    />
-                    {errors.attendeeCount && (
-                      <p className="text-red-500 text-sm mt-1">{errors.attendeeCount}</p>
-                    )}
+                    <div className="w-full p-3 bg-gray-50 border rounded-md text-gray-700">
+                      {groupInfo.eventDetails?.attendeeCount || 0} người đã xác nhận tham gia
+                    </div>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Số lượng người tham gia được cập nhật tự động khi thành viên xác nhận tham gia
+                    </p>
                   </div>
                 </div>
               </div>

@@ -7,6 +7,9 @@ const mockGroups = [
   { id: 3, name: 'Nhóm 3', memberCount: 5, createdDate: '3-4-2025', status: 'Dừng hoạt động', isLeader: true },
 ];
 
+// Mock variable to store event participation data
+let eventParticipants = {};
+
 // Get all groups for the current user
 export const getUserGroups = async () => {
   try {
@@ -168,6 +171,47 @@ export const getGroupById = async (groupId) => {
       success: false,
       data: null,
       message: error.message || 'Không thể lấy thông tin nhóm',
+    };
+  }
+};
+
+// Confirm participation in event
+export const confirmEventParticipation = async (groupId) => {
+  try {
+    // When API is ready, use this:
+    // const response = await api.post(`/groups/${groupId}/events/participate`);
+    // return response.data;
+    
+    // Mock response
+    if (!eventParticipants[groupId]) {
+      eventParticipants[groupId] = new Set();
+    }
+    
+    // Add current user to participants (in a real app, you'd use actual user ID)
+    eventParticipants[groupId].add('currentUser');
+    
+    // Update the group's event details in mock data
+    const groupIndex = mockGroups.findIndex(g => g.id === parseInt(groupId, 10));
+    if (groupIndex !== -1) {
+      const participantCount = eventParticipants[groupId].size;
+      mockGroups[groupIndex].eventDetails = {
+        ...mockGroups[groupIndex].eventDetails,
+        attendeeCount: participantCount
+      };
+    }
+    
+    return {
+      success: true,
+      data: {
+        participantCount: eventParticipants[groupId].size
+      },
+      message: 'Đã xác nhận tham gia sự kiện'
+    };
+  } catch (error) {
+    console.error('Error confirming event participation:', error);
+    return {
+      success: false,
+      message: error.message || 'Không thể xác nhận tham gia'
     };
   }
 };

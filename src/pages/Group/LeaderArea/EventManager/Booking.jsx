@@ -373,18 +373,8 @@ const Booking = () => {
                   placeholder="Thêm các ghi chú đặc biệt hoặc yêu cầu (nếu có)"
                 />
               </div>
-            </div>            {/* Chính sách đặt chỗ */}
-            <div className="bg-blue-50 p-4 mt-6 mb-6 rounded-lg border border-blue-100">
-              <div className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-sm text-blue-800">
-                  <strong>Chính sách đặt chỗ:</strong> Việc đặt chỗ sẽ gửi thông tin trực tiếp đến địa điểm kinh doanh. 
-                  Bạn có thể cần thanh toán đặt cọc để xác nhận việc đặt chỗ. Vui lòng kiểm tra kỹ thông tin trước khi xác nhận.
-                </p>
-              </div>
-            </div>
+            </div>          
+            
             
             {/* Thông tin tóm tắt sự kiện */}
             <div className="bg-purple-50 p-4 mt-6 rounded-lg border border-purple-100">

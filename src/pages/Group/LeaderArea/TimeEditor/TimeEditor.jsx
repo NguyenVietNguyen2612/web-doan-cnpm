@@ -6,6 +6,7 @@ import ChooseMonthAndYear from '../../../../components/groupWidgets/TimeManager/
 import ChoosePeriod from '../../../../components/groupWidgets/TimeManager/ChoosePeriod';
 import ChooseFreeTime from '../../../../components/groupWidgets/TimeManager/ChooseFreeTime';
 import { getGroupById } from '../../../../services/groupService';
+import { Dialog } from '../../../../components/common/Dialog';
 
 // Hàm để tạo ngày từ chuỗi ngày tháng năm dạng yyyy-mm-dd (định dạng chuẩn cho input type="date")
 const parseDate = (dateString) => {
@@ -44,6 +45,8 @@ const TimeEditor = () => {
   const [availabilityGrid, setAvailabilityGrid] = useState({});
   const [originalGrid, setOriginalGrid] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   // Lấy thông tin nhóm khi component được mount
   useEffect(() => {
@@ -70,11 +73,11 @@ const TimeEditor = () => {
           setOriginalGrid(JSON.parse(JSON.stringify(mockGrid)));
         } else {
           console.error('Lỗi khi lấy thông tin nhóm:', response.message);
-          alert('Không thể lấy thông tin nhóm. Vui lòng thử lại sau.');
+          // Sẽ xử lý thông báo lỗi bằng Dialog trong bản cập nhật tiếp theo
         }
       } catch (error) {
         console.error('Lỗi khi lấy thông tin nhóm:', error);
-        alert('Có lỗi xảy ra khi tải dữ liệu.');
+        // Sẽ xử lý thông báo lỗi bằng Dialog trong bản cập nhật tiếp theo
       }
     };
 
@@ -91,36 +94,41 @@ const TimeEditor = () => {
   const handlePeriodChange = (newDateRange) => {
     setSelectedDayRange(newDateRange);
   };
+
   // Hàm xử lý khi nhấn nút Lưu
   const handleSave = (updatedGrid) => {
-    // Trong thực tế, ở đây sẽ gọi API để lưu dữ liệu xuống database
     try {
       // Giả lập gọi API thành công
       setTimeout(() => {
         setOriginalGrid(JSON.parse(JSON.stringify(updatedGrid)));
         setAvailabilityGrid(updatedGrid);
         setHasChanges(false);
-        
-        // Hiển thị thông báo thành công
-        alert('Đã lưu lịch rảnh thành công!');
+        setShowSuccessDialog(true);
       }, 500);
     } catch (error) {
       console.error('Lỗi khi lưu lịch rảnh:', error);
-      alert('Có lỗi xảy ra khi lưu dữ liệu. Vui lòng thử lại!');
+      // Sẽ xử lý thông báo lỗi bằng Dialog trong bản cập nhật tiếp theo
     }
   };
 
   // Hàm xử lý khi nhấn nút Hủy
   const handleCancel = () => {
-    // Khôi phục trạng thái ban đầu
+    // Hiện dialog xác nhận trước khi hủy
+    setShowCancelDialog(true);
+  };
+
+  // Xác nhận hủy thay đổi
+  const confirmCancel = () => {
     setAvailabilityGrid(JSON.parse(JSON.stringify(originalGrid)));
     setHasChanges(false);
-    alert('Đã hủy các thay đổi!');
+    setShowCancelDialog(false);
   };
+
   // Chỉ để tham chiếu cho việc chuyển đến trang sự kiện khi cần
   const handleBack = () => {
     navigate(`/groups/${groupId}/event-manager`);
-  };  
+  };
+  
   // Các nút chức năng bên phải
   const rightButtons = [
     { label: 'Chỉnh sửa thời gian', onClick: () => {} },
@@ -140,7 +148,8 @@ const TimeEditor = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header - luôn trở về trang danh sách nhóm */}      <GroupHeader 
+      {/* Header - luôn trở về trang danh sách nhóm */}      
+      <GroupHeader 
         groupName={groupInfo.name || 'Đang tải...'}
         memberCount={groupInfo.memberCount || 0}
         showBackToGroups={true}
@@ -177,6 +186,27 @@ const TimeEditor = () => {
           />
         </div>
       </LeaderLayout>
+
+      {/* Dialog thành công */}
+      <Dialog
+        isOpen={showSuccessDialog}
+        onClose={() => setShowSuccessDialog(false)}
+        title="Thành công"
+        message="Đã lưu lịch rảnh thành công!"
+        type="alert"
+      />
+
+      {/* Dialog xác nhận hủy */}
+      <Dialog
+        isOpen={showCancelDialog}
+        onClose={() => setShowCancelDialog(false)}
+        onConfirm={confirmCancel}
+        title="Xác nhận hủy"
+        message="Bạn có chắc chắn muốn hủy các thay đổi không?"
+        type="confirm"
+        confirmText="Đồng ý"
+        cancelText="Không"
+      />
     </div>
   );
 };
