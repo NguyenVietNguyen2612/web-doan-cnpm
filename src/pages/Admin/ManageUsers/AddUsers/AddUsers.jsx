@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HiPlus, HiX, HiOutlineTrash } from 'react-icons/hi';
+import { addUsers } from '../services';
 
 const AddUsers = () => {
   const [emailList, setEmailList] = useState('');
@@ -66,30 +67,15 @@ const AddUsers = () => {
     try {
       setIsAdding(true);
       
-      // Giả lập gọi API để thêm người dùng
-      // Trong ứng dụng thực tế, thay thế bằng gọi API thực
-      /*
-      const response = await fetch('/api/admin/users/batch-add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emails: userEmails,
-          defaultPassword: defaultPassword
-        })
-      });
+      const result = await addUsers(userEmails, defaultPassword);
       
-      if (!response.ok) {
-        throw new Error('Có lỗi xảy ra khi thêm người dùng');
+      if (result.success) {
+        setSuccess(result.message);
+        setUserEmails([]);
+        setDefaultPassword('');
+      } else {
+        setError(result.message);
       }
-      */
-      
-      // Giả lập độ trễ
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setSuccess(`Đã thêm thành công ${userEmails.length} người dùng.`);
-      setUserEmails([]);
-      setDefaultPassword('');
-      
     } catch (error) {
       setError(error.message);
     } finally {

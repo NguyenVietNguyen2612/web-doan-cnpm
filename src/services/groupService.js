@@ -1,26 +1,14 @@
 import api from './api';
 
-// Mock implementation until backend is ready
-const mockGroups = [
-  { id: 1, name: 'Nhóm 1', memberCount: 6, createdDate: '21-5-2025', status: 'Đang hoạt động', isLeader: true },
-  { id: 2, name: 'Nhóm 2', memberCount: 7, createdDate: '19-4-2025', status: 'Đang hoạt động', isLeader: false },
-  { id: 3, name: 'Nhóm 3', memberCount: 5, createdDate: '3-4-2025', status: 'Dừng hoạt động', isLeader: true },
-];
-
-// Mock variable to store event participation data
-let eventParticipants = {};
+const BASE_PATH = '/groups';
 
 // Get all groups for the current user
 export const getUserGroups = async () => {
   try {
-    // When API is ready, use this:
-    // const response = await api.get('/groups');
-    // return response.data;
-    
-    // Mock response
+    const response = await api.get(`${BASE_PATH}`);
     return {
       success: true,
-      data: mockGroups,
+      data: response.data,
       message: 'Lấy danh sách nhóm thành công',
     };
   } catch (error) {
@@ -28,7 +16,7 @@ export const getUserGroups = async () => {
     return {
       success: false,
       data: [],
-      message: error.message || 'Không thể lấy danh sách nhóm',
+      message: error.response?.data?.message || 'Không thể lấy danh sách nhóm',
     };
   }
 };
@@ -36,25 +24,10 @@ export const getUserGroups = async () => {
 // Create a new group
 export const createGroup = async (groupData) => {
   try {    
-    // When API is ready, use this:
-    // const response = await api.post('/groups', groupData);
-    // return response.data;
-    
-    // Mock response
-    const newGroup = {
-      id: mockGroups.length + 1,
-      name: groupData.name,
-      memberCount: 1, // Starting with just the creator
-      createdDate: new Date().toLocaleDateString('vi-VN'),
-      status: 'Đang hoạt động',
-      isLeader: true, // Creator is automatically the leader of the group
-    };
-    
-    mockGroups.push(newGroup);
-    
+    const response = await api.post(`${BASE_PATH}`, groupData);
     return {
       success: true,
-      data: newGroup,
+      data: response.data,
       message: 'Tạo nhóm thành công',
     };
   } catch (error) {
@@ -62,7 +35,7 @@ export const createGroup = async (groupData) => {
     return {
       success: false,
       data: null,
-      message: error.message || 'Không thể tạo nhóm mới',
+      message: error.response?.data?.message || 'Không thể tạo nhóm mới',
     };
   }
 };
@@ -70,16 +43,7 @@ export const createGroup = async (groupData) => {
 // Delete a group
 export const deleteGroup = async (groupId) => {
   try {
-    // When API is ready, use this:
-    // const response = await api.delete(`/groups/${groupId}`);
-    // return response.data;
-    
-    // Mock response
-    const index = mockGroups.findIndex(group => group.id === groupId);
-    if (index !== -1) {
-      mockGroups.splice(index, 1);
-    }
-    
+    const response = await api.delete(`${BASE_PATH}/${groupId}`);
     return {
       success: true,
       message: 'Xóa nhóm thành công',
@@ -88,7 +52,7 @@ export const deleteGroup = async (groupId) => {
     console.error('Error deleting group:', error);
     return {
       success: false,
-      message: error.message || 'Không thể xóa nhóm',
+      message: error.response?.data?.message || 'Không thể xóa nhóm',
     };
   }
 };
@@ -96,23 +60,7 @@ export const deleteGroup = async (groupId) => {
 // Leave a group
 export const leaveGroup = async (groupId) => {
   try {
-    // When API is ready, use this:
-    // const response = await api.post(`/groups/${groupId}/leave`);
-    // return response.data;
-    
-    // Mock response
-    const index = mockGroups.findIndex(group => group.id === parseInt(groupId, 10));
-    if (index !== -1) {
-      // If the user is the leader, we might want to handle that differently
-      // For now, just remove them from the group
-      mockGroups[index].memberCount = Math.max(1, mockGroups[index].memberCount - 1);
-      
-      // If the user was the leader, we remove the isLeader flag
-      if (mockGroups[index].isLeader) {
-        mockGroups[index].isLeader = false;
-      }
-    }
-    
+    const response = await api.delete(`${BASE_PATH}/${groupId}/members/me`);
     return {
       success: true,
       message: 'Rời nhóm thành công',
@@ -121,7 +69,7 @@ export const leaveGroup = async (groupId) => {
     console.error('Error leaving group:', error);
     return {
       success: false,
-      message: error.message || 'Không thể rời nhóm',
+      message: error.response?.data?.message || 'Không thể rời nhóm',
     };
   }
 };
@@ -129,39 +77,16 @@ export const leaveGroup = async (groupId) => {
 // Get a specific group by ID
 export const getGroupById = async (groupId) => {
   try {
-    // When API is ready, use this:
-    // const response = await api.get(`/groups/${groupId}`);
-    // return response.data;
+    const response = await api.get(`${BASE_PATH}/${groupId}`);
     
-    // Mock response
-    const parsedId = parseInt(groupId, 10);
-    const group = mockGroups.find(g => g.id === parsedId);
-    
-    if (!group) {
-      return {
-        success: false,
-        data: null,
-        message: 'Không tìm thấy nhóm',
-      };
-    }
-    
-    // Add mock event details for this group
-    const eventDetails = {
-      name: 'Cf Góc Phố',
-      location: 'Đường T1, Đông Hòa, Dĩ An, Bình Dương',
-      time: 'Từ 8h - 15h',
-      locationType: 'Quán cà phê',
-      matchRate: '66.7%',
-      bookingStatus: 'Chưa đặt',
-      notificationStatus: 'Đã thông báo',
-      attendeeCount: group.memberCount - 2, // Mock data: assuming not everyone is attending
-    };
+    // Lấy thêm thông tin thành viên của nhóm
+    const membersResponse = await api.get(`${BASE_PATH}/${groupId}/members`);
     
     return {
       success: true,
       data: {
-        ...group,
-        eventDetails
+        ...response.data,
+        members: membersResponse.data
       },
       message: 'Lấy thông tin nhóm thành công',
     };
@@ -170,48 +95,53 @@ export const getGroupById = async (groupId) => {
     return {
       success: false,
       data: null,
-      message: error.message || 'Không thể lấy thông tin nhóm',
+      message: error.response?.data?.message || 'Không thể lấy thông tin nhóm',
     };
   }
 };
 
-// Confirm participation in event
-export const confirmEventParticipation = async (groupId) => {
+// Thêm thành viên vào nhóm
+export const addMember = async (groupId, userData) => {
   try {
-    // When API is ready, use this:
-    // const response = await api.post(`/groups/${groupId}/events/participate`);
-    // return response.data;
-    
-    // Mock response
-    if (!eventParticipants[groupId]) {
-      eventParticipants[groupId] = new Set();
-    }
-    
-    // Add current user to participants (in a real app, you'd use actual user ID)
-    eventParticipants[groupId].add('currentUser');
-    
-    // Update the group's event details in mock data
-    const groupIndex = mockGroups.findIndex(g => g.id === parseInt(groupId, 10));
-    if (groupIndex !== -1) {
-      const participantCount = eventParticipants[groupId].size;
-      mockGroups[groupIndex].eventDetails = {
-        ...mockGroups[groupIndex].eventDetails,
-        attendeeCount: participantCount
-      };
-    }
-    
+    const response = await api.post(`${BASE_PATH}/${groupId}/members`, userData);
     return {
       success: true,
-      data: {
-        participantCount: eventParticipants[groupId].size
-      },
-      message: 'Đã xác nhận tham gia sự kiện'
+      data: response.data,
+      message: 'Thêm thành viên thành công',
     };
   } catch (error) {
-    console.error('Error confirming event participation:', error);
+    console.error('Error adding member:', error);
     return {
       success: false,
-      message: error.message || 'Không thể xác nhận tham gia'
+      data: null,
+      message: error.response?.data?.message || 'Không thể thêm thành viên',
     };
   }
+};
+
+// Xóa thành viên khỏi nhóm
+export const removeMember = async (groupId, userId) => {
+  try {
+    const response = await api.delete(`${BASE_PATH}/${groupId}/members/${userId}`);
+    return {
+      success: true,
+      message: 'Xóa thành viên thành công',
+    };
+  } catch (error) {
+    console.error('Error removing member:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Không thể xóa thành viên',
+    };
+  }
+};
+
+export default {
+  getUserGroups,
+  createGroup,
+  deleteGroup,
+  leaveGroup,
+  getGroupById,
+  addMember,
+  removeMember
 };

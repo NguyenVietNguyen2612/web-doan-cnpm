@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../../components/common/Logo';
 import Input from '../../../components/common/Input';
 import { RoundButton } from '../../../components/common/Button';
-import { authenticateUser } from '../../../mocks/userMocks';
+import authService from '../../../services/authService';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ const Login = () => {
     password: ''
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,24 +35,35 @@ const Login = () => {
     }
 
     try {
-      const response = await authenticateUser(formData.username, formData.password);
+      setIsLoading(true);
+      const response = await authService.login({
+        username: formData.username,
+        password: formData.password
+      });
       
-      // Lưu thông tin user vào localStorage
-      localStorage.setItem('user', JSON.stringify(response));
-      localStorage.setItem('token', response.token);
-
-      // Chuyển hướng dựa vào role
-      if (response.role === 'member') {
-        navigate('/dashboard');
-      } else if (response.role === 'admin') {
-        navigate('/admin');
-      } else if (response.role === 'enterprise') {
-        navigate('/enterprise');
+      if (response.success) {
+        // Thông tin người dùng và token đã được lưu trong authService.login
+        const user = authService.getCurrentUser();
+        
+        // Chuyển hướng dựa vào role
+        if (user.role === 'Member') {
+          navigate('/dashboard');
+        } else if (user.role === 'Admin') {
+          navigate('/admin');
+        } else if (user.role === 'Enterprise') {
+          navigate('/enterprise');
+        }
+      } else {
+        setErrors({
+          password: response.message
+        });
       }
     } catch (error) {
       setErrors({
-        password: error.message
+        password: error.message || 'Đăng nhập thất bại'
       });
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -100,8 +112,9 @@ const Login = () => {
                 type="submit" 
                 variant="primary-light" 
                 size="lg"
+                disabled={isLoading}
               >
-                Đăng nhập
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </RoundButton>
             </div>
           </form>
