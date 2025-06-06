@@ -9,14 +9,14 @@ module.exports = {
   db: {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'Nguyen21viet8hung5@$',
-    database: process.env.DB_NAME || 'web_scheduler',
-    port: process.env.DB_PORT || 3306
+    password: process.env.DB_PASSWORD || 
+    database: process.env.DB_NAME || 
+    port: process.env.DB_PORT ||
   },
   
   // JWT configuration
-  jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
-  jwtExpiration: process.env.JWT_EXPIRATION || '24h',
+  jwtSecret: process.env.JWT_SECRET || 
+  jwtExpiration: process.env.JWT_EXPIRATION || 
   
   // CORS configuration
   corsOrigin: process.env.CORS_ORIGIN || ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'] // Chấp nhận multiple origins
