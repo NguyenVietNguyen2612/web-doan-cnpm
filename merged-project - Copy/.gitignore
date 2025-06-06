@@ -88,3 +88,59 @@ dist
 # Temporary folders
 tmp/
 temp/ 
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+# Config files containing sensitive data
+backend/config.js
+
+# Database files with sample/test data
+*.sql
+!backend/schema.sql
+!backend/database/schema.sql
+
+# API keys and secrets (if any)
+**/*api-keys*
+**/*secrets*
+**/*credentials*
+
+# Local environment specific files
+.env.*.local
+
+# IDE workspace files
+*.code-workspace
+.vscode/settings.json
+.vscode/launch.json
+
+# Runtime and process files
+*.pid
+*.pid.lock
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
