@@ -36,27 +36,15 @@ npm run install:frontend
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=web_scheduler
-JWT_SECRET=your_jwt_secret_key_here
+DB_PASSWORD=
+DB_NAME=
+JWT_SECRET=
 PORT=5000
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=
 ```
 
 2. Tạo database MySQL và chạy script schema:
 ```bash
-# Tạo database
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS web_scheduler;"
-
-# Import schema
-cd backend
-mysql -u root -p web_scheduler < schema.sql
-
-# Import dữ liệu mẫu (tùy chọn)
-mysql -u root -p web_scheduler < data.sql
-```
-
-📋 **Xem thêm hướng dẫn chi tiết trong file `setup-database.md`**
 
 ### Frontend
 Frontend sẽ tự động kết nối đến backend trên port 3000.
@@ -89,7 +77,6 @@ npm run build
 ### Backend
 - Express.js
 - MySQL2
-- JWT Authentication
 - bcrypt
 - CORS
 
