@@ -24,11 +24,11 @@ PORT=8080
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
-DB_NAME=web_scheduler
+DB_NAME=
 
 # JWT Configuration
-JWT_SECRET=your_jwt_secret_key_should_be_complex_and_secure
-JWT_EXPIRES_IN=24h
+JWT_SECRET=
+JWT_EXPIRES_IN=
 ```
 5. Chạy server:
 ```
