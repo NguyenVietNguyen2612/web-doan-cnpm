@@ -10,6 +10,11 @@ router.post('/login', userController.login);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 
+// Email verification routes
+router.post('/send-email-verification', userController.sendEmailVerification);
+router.post('/verify-email', userController.verifyEmailCode);
+router.post('/resend-email-verification', userController.resendEmailVerification);
+
 // Routes yêu cầu xác thực
 router.get('/', authMiddleware.verifyToken, authMiddleware.isAdmin, userController.getAllUsers);
 router.get('/:id', authMiddleware.verifyToken, userController.getUserById);
